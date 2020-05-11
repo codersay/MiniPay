@@ -49,7 +49,7 @@ type PayArg struct {
 	//	Body string `json:"body,omitempty"` // 如果为空置则忽略字段
 	//	Time int64  `json:"-"`              // 直接忽略字段
 	//}
-	
+	APPID       string       // appID
 	TradeNum    string  `json:"tradeNum,omitempty"`
 	MoneyFee    float64 `json:"MoneyFee,omitempty"`
 	CallbackURL string  `json:"callbackURL,omitempty"`
