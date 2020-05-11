@@ -268,7 +268,8 @@ func MinipaySign(key string, m map[string]interface{}) (string, error) {
 }
 
 //对微信下订单或者查订单
-func PostMiniPay(url string, data map[string]interface{}) (xmlRe MiniPaySyncResult, error) { 
+func PostMiniPay(url string, data map[string]interface{}) (MiniPaySyncResult, error) {
+	var xmlRe MiniPaySyncResult
 	buf := bytes.NewBufferString("")
 
 	for k, v := range data {
