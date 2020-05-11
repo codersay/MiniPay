@@ -1,3 +1,9 @@
+// Copyright 2019 全栈编程@luboke.com  All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// MiniPay.
+
 package MiniPay
 
 import (
@@ -17,7 +23,7 @@ var (
 	appId         string
 	signType      string
 	tradeType     string
-	xmlRe         MiniPaySyncResult
+	xmlRe         MiniPaySyncResult //支付同步结果
 )
 
 //初始化参数
@@ -27,36 +33,36 @@ func init() {
 	tradeType = "JSAPI"
 }
 
-//初始化小程序参数
-func InitMinipay(pay *MiniPayParams) {
+//初始化支付公用参数
+func InitMiniPay(pay *MiniPayParams){
 	miniPayParams = pay
 }
 
+//返回支付公用参数
 func Minipay() *MiniPayParams {
 	return miniPayParams
 }
 
 // Pay 支付
-func (this *MiniPayParams) UnifiedPay(charge *PayArg) (map[string]interface{}, error) {
+func (this *MiniPayParams) UnifiedPay(payArg *PayArg) (map[string]interface{}, error) {
 	appId = this.AppID
-	if charge.APPID != "" {
-		appId = charge.APPID
+	if payArg.APPID != "" {
+		appId = payArg.APPID
 	}
 	payHandle = make(map[string]interface{})
 	payHandle["appid"] = appId
 	payHandle["mch_id"] = this.MchID
 	payHandle["nonce_str"] = RandomString()
-	//payHandle["body"] = PreDealData(charge.Body, 32)
-	payHandle["body"] = (charge.Body)
-	payHandle["out_trade_no"] = charge.TradeNum
-	payHandle["total_fee"] = Float2String(charge.MoneyFee)
+	payHandle["body"] = payArg.Body
+	payHandle["out_trade_no"] = payArg.TradeNum
+	payHandle["total_fee"] = Float2String(payArg.MoneyFee)
 
-	//payHandle["total_fee"] = strconv.FormatFloat(charge.MoneyFee,'E',-1,32)
+	//payHandle["total_fee"] = strconv.FormatFloat(payArg.MoneyFee,'E',-1,32)
  	//payHandle["spbill_create_ip"] = common.LocalIP()
 	payHandle["spbill_create_ip"] = "49.234.14.102"
-	payHandle["notify_url"] = charge.CallbackURL
+	payHandle["notify_url"] = payArg.CallbackURL
 	payHandle["trade_type"] = tradeType
-	payHandle["openid"] = charge.OpenID
+	payHandle["openid"] = payArg.OpenID
 	payHandle["sign_type"] = signType
 	logs.Debug("签名之前的数据：", payHandle)
 	if sign, err = MinipaySign(this.Key, payHandle); err != nil {

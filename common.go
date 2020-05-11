@@ -1,3 +1,9 @@
+// Copyright 2019 全栈编程@luboke.com  All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// MiniPay.
+
 package MiniPay
 
 //封装
@@ -28,9 +34,34 @@ type MiniPayParams struct {
 	Key         string       // 密钥
 }
 
+
+// Charge 发起小程序预下单的支付参数，基他参数在发起拼接时临时改，比如minipay.go文件 第57行 payHandle["nonce_str"] = RandomStr()
+//https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
+//支付需要的参数，这里是变化的参数，即服务端传递的
+type PayArg struct {
+	//Golang中，如果指定一个field序列化成JSON的变量名字为-，则序列化的时候自动忽略这个field。
+	//而omitempty的作用是当一个field的值是empty的时候，序列化JSON时候忽略这个field（Newtonsoft.Json的类似用法参考这里和例子）。
+	//https://ethancai.github.io/2016/06/23/bad-parts-about-json-serialization-in-Golang/
+	//使用omitempty熟悉，如果该字段为nil或0值（数字0,字符串"",空数组[]等），则打包的JSON结果不会有这个字段。
+	//https://blog.csdn.net/tiaotiaoyly/article/details/38942311
+	//type Message struct {
+	//	Name string `json:"msg_name"`       // 对应JSON的msg_name
+	//	Body string `json:"body,omitempty"` // 如果为空置则忽略字段
+	//	Time int64  `json:"-"`              // 直接忽略字段
+	//}
+	
+	TradeNum    string  `json:"tradeNum,omitempty"`
+	MoneyFee    float64 `json:"MoneyFee,omitempty"`
+	CallbackURL string  `json:"callbackURL,omitempty"`
+	Body        string  `json:"body,omitempty"`
+	OpenID      string  `json:"openid,omitempty"`
+}
+
 // MiniPayCommonResult 基本信息,状态码与状态描述
-//统一下单与查询结果能用部分
+//统一下单与查询结果通用部分
 // https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
+//https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_2
+//返回结果
 type MiniPayCommonResult struct {
 	ReturnCode string `xml:"return_code" json:"return_code,omitempty"`
 	ReturnMsg  string `xml:"return_msg" json:"return_msg,omitempty"`
@@ -40,11 +71,11 @@ type MiniPayCommonResult struct {
 //https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
 //统一下单 返回结果 的一部分
 // 以下字段在return_code为SUCCESS的时候有返回
-//统一下单与查询结果能用部分
+//统一下单与查询结果通用部分
 type MiniPayReturnSuccessData struct {
 	AppID      string `xml:"appid,omitempty" json:"appid,omitempty"`
 	MchID      string `xml:"mch_id,omitempty" json:"mch_id,omitempty"`
-	MchAppid   string `xml:"mch_appid,omitempty" json:"mch_appid,omitempty"`
+	//DeviceInfo 统一下单默认就有，查询结果在return_code 、result_code、trade_state都为SUCCESS时有返回，这里统一放在这里
 	DeviceInfo string `xml:"device_info,omitempty" json:"device_info,omitempty"`
 	NonceStr   string `xml:"nonce_str,omitempty" json:"nonce_str,omitempty"`
 	Sign       string `xml:"sign,omitempty" json:"sign,omitempty"`
@@ -63,9 +94,25 @@ type MiniPayResultData struct {
 	TradeState     string `xml:"trade_state,omitempty" json:"trade_state,omitempty"`
 	BankType       string `xml:"bank_type,omitempty" json:"bank_type,omitempty"`
 	TotalFee       string `xml:"total_fee,omitempty" json:"total_fee,omitempty"`
+	SettlementTotalFee  string `xml:"settlement_total_fee,omitempty" json:"settlement_total_fee,omitempty"`
 	FeeType        string `xml:"fee_type,omitempty" json:"fee_type,omitempty"`
 	CashFee        string `xml:"cash_fee,omitempty" json:"cash_fee,omitempty"`
 	CashFeeType    string `xml:"cash_fee_type,omitempty" json:"cash_fee_type,omitempty"`
+
+	/*
+	代金券金额	coupon_fee	否	Int	100	“代金券”金额<=订单金额，订单金额-“代金券”金额=现金支付金额，详见支付金额
+	代金券使用数量	coupon_count	否	Int	1	代金券使用数量
+	代金券类型	coupon_type_$n	否	String	CASH
+	CASH--充值代金券
+	NO_CASH---非充值优惠券
+
+	开通免充值券功能，并且订单使用了优惠券后有返回（取值：CASH、NO_CASH）。$n为下标,从0开始编号，举例：coupon_type_$0
+
+	代金券ID	coupon_id_$n	否	String(20)	10000 	代金券ID, $n为下标，从0开始编号
+	单个代金券支付金额	coupon_fee_$n	否	Int	100	单个代金券支付金额, $n为下标，从0开始编号
+	*/
+
+
 	TransactionID  string `xml:"transaction_id,omitempty" json:"transaction_id,omitempty"`
 	OutTradeNO     string `xml:"out_trade_no,omitempty" json:"out_trade_no,omitempty"`
 	Attach         string `xml:"attach,omitempty" json:"attach,omitempty"`
@@ -83,10 +130,10 @@ type MinipayStateData struct {
 
 //异步支付 返回结果
 type MiniPayAsyncResult struct {
-	//统一下单与查询结果能用部分
+	//统一下单与查询结果通用部分
 	MiniPayCommonResult
 
-	//统一下单与查询结果能用部分
+	//统一下单与查询结果通用部分
 	MiniPayReturnSuccessData
 
 	// 查询结果或者下单返回公用部分
@@ -95,38 +142,13 @@ type MiniPayAsyncResult struct {
 
 //统一下单请求的响应,即同步的响应
 type MiniPaySyncResult struct {
-	//统一下单与查询结果能用部分
+	//统一下单与查询结果通用部分
 	MiniPayCommonResult
 
-	//统一下单与查询结果能用部分
+	//统一下单与查询结果通用部分
 	MiniPayReturnSuccessData
 
 	MinipayStateData
-}
-
-
-// Charge 发起小程序预下单的支付参数，基他参数在发起拼接时临时改，比如minipay.go文件 第57行 payHandle["nonce_str"] = RandomStr()
-//https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
-
-//支付需要的参数
-type PayArg struct {
-	//Golang中，如果指定一个field序列化成JSON的变量名字为-，则序列化的时候自动忽略这个field。
-	//而omitempty的作用是当一个field的值是empty的时候，序列化JSON时候忽略这个field（Newtonsoft.Json的类似用法参考这里和例子）。
-	//https://ethancai.github.io/2016/06/23/bad-parts-about-json-serialization-in-Golang/
-	//使用omitempty熟悉，如果该字段为nil或0值（数字0,字符串"",空数组[]等），则打包的JSON结果不会有这个字段。
-	//https://blog.csdn.net/tiaotiaoyly/article/details/38942311
-	//type Message struct {
-	//	Name string `json:"msg_name"`       // 对应JSON的msg_name
-	//	Body string `json:"body,omitempty"` // 如果为空置则忽略字段
-	//	Time int64  `json:"-"`              // 直接忽略字段
-	//}
-
-	APPID       string  `json:"-"`
-	TradeNum    string  `json:"tradeNum,omitempty"`
-	MoneyFee    float64 `json:"MoneyFee,omitempty"`
-	CallbackURL string  `json:"callbackURL,omitempty"`
-	Body        string  `json:"body,omitempty"`
-	OpenID      string  `json:"openid,omitempty"`
 }
 
 func init() {
@@ -134,24 +156,19 @@ func init() {
 }
 
 // 用户下单支付接口
-func Order2Pay(charge *PayArg) (map[string]interface{}, error) {
-	re, err := Minipay().UnifiedPay(charge)
+func Order2Pay(payArg *PayArg) (map[string]interface{}, error) {
+	re, err := Minipay().UnifiedPay(payArg)
 	return re, err
 }
 
 // MiniCallback 微信支付
-/*
-
-response是ResponseWriter接口的实现。
-WriteHeader方法：
-设置响应的状态码，返回错误状态码特别有用。WriteHeader方法在执行完毕之后就不允许对首部进行写入了。
-
-向客户端返回JSON数据：
-首先使用Header方法将内容类型设置成application/json，然后将JSON数据写入ResponseWriter中
-
-*/
-
-//go 处理http response 通过beego
+//response是ResponseWriter接口的实现。
+//WriteHeader方法：
+//设置响应的状态码，返回错误状态码特别有用。WriteHeader方法在执行完毕之后就不允许对首部进行写入了。
+//
+//向客户端返回JSON数据：
+//首先使用Header方法将内容类型设置成application/json，然后将JSON数据写入ResponseWriter中
+//go 处理http response
 func MiniPayNotifyCallback(w http.ResponseWriter, body []byte) (*MiniPayAsyncResult, *MiniPayCommonResult, error) {
 	var returnCode = "FAIL"
 	var returnMsg = ""
@@ -251,8 +268,7 @@ func MinipaySign(key string, m map[string]interface{}) (string, error) {
 }
 
 //对微信下订单或者查订单
-func PostMiniPay(url string, data map[string]interface{}) (MiniPaySyncResult, error) {
-	var xmlRe MiniPaySyncResult
+func PostMiniPay(url string, data map[string]interface{}) (xmlRe MiniPaySyncResult, error) { 
 	buf := bytes.NewBufferString("")
 
 	for k, v := range data {
