@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"log"
 )
 
 //http/https客户端及方法
