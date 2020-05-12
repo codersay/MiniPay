@@ -10,7 +10,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego/logs"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -74,9 +73,9 @@ func NewHTTPSClient(certPEMBlock, keyPEMBlock []byte) *HTTPSClient {
 // https 提交post数据
 func (httpsclient *HTTPSClient) PostData(url string, contentType string, data string) ([]byte, error) {
 	resp, err := httpsclient.Post(url, contentType, strings.NewReader(data))
-	logs.Debug("data-------", data)
-	logs.Debug("PostData响应的结果-------", resp)
-	logs.Debug("PostData响应的错误-------", err)
+	log.Println("data-------", data)
+	log.Println("PostData响应的结果-------", resp)
+	log.Println("PostData响应的错误-------", err)
 	if err != nil {
 		panic(err)
 	}

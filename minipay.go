@@ -9,7 +9,6 @@ package MiniPay
 import (
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego/logs"
 	//"strconv"
 	"time"
 )
@@ -64,18 +63,18 @@ func (this *MiniPayParams) UnifiedPay(payArg *PayArg) (map[string]interface{}, e
 	payHandle["trade_type"] = tradeType
 	payHandle["openid"] = payArg.OpenID
 	payHandle["sign_type"] = signType
-	logs.Debug("签名之前的数据：", payHandle)
+	log.Println("签名之前的数据：", payHandle)
 	if sign, err = MinipaySign(this.Key, payHandle); err != nil {
-		logs.Debug("签名失败：", err.Error())
+		log.Println("签名失败：", err.Error())
 		return payHandle, err
 	}
 	payHandle["sign"] = sign
 
-	logs.Debug("发起支付的参数：------", payHandle)
+	log.Println("发起支付的参数：------", payHandle)
 
 	// 预下单
 	if xmlRe, err = PostMiniPay("https://api.mch.weixin.qq.com/pay/unifiedorder", payHandle); err != nil {
-		logs.Debug("预下单失败：", err.Error())
+		log.Println("预下单失败：", err.Error())
 		return payHandle, err
 	}
 

@@ -13,7 +13,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego/logs"
+	"log"
 	"github.com/shopspring/decimal"
 	"io"
 	"net"
@@ -173,19 +173,19 @@ func MiniPayNotifyCallback(w http.ResponseWriter, body []byte) (*MiniPayAsyncRes
 	var returnCode = "FAIL"
 	var returnMsg = ""
 	var miniPayCommonResult MiniPayCommonResult
-	logs.Debug(w)
+	log.Println(w)
 	defer func() {
 		//formatStr := `<xml><return_code><![CDATA[%s]]></return_code><return_msg>![CDATA[%s]]</return_msg></xml>`
 		//returnBody = fmt.Sprintf(formatStr, returnCode, returnMsg)
-		logs.Debug("logs.Debug(miniPayCommonResult)---before-----", miniPayCommonResult)
+		log.Println("log.Println(miniPayCommonResult)---before-----", miniPayCommonResult)
 		miniPayCommonResult.ReturnCode = returnCode
 		miniPayCommonResult.ReturnMsg = returnMsg
-		logs.Debug("logs.Debug(miniPayCommonResult)---after-----", miniPayCommonResult)
+		log.Println("log.Println(miniPayCommonResult)---after-----", miniPayCommonResult)
 
 	}()
 	var reXML MiniPayAsyncResult
-	logs.Debug(body)
-	logs.Debug(string(body))
+	log.Println(body)
+	log.Println(string(body))
 	if string(body) == "" {
 		returnCode = "FAIL"
 		returnMsg = "Bodyerror"
@@ -212,11 +212,11 @@ func MiniPayNotifyCallback(w http.ResponseWriter, body []byte) (*MiniPayAsyncRes
 		signData = append(signData, fmt.Sprintf("%v=%v", k, v))
 	}
 
-	logs.Debug(signData)
+	log.Println(signData)
 
-	logs.Debug("minipay()----", &Minipay().Key)
+	log.Println("minipay()----", &Minipay().Key)
 	key := Minipay().Key
-	logs.Debug("key------", key)
+	log.Println("key------", key)
 	mySign, err := MinipaySign(key, m)
 	if err != nil {
 		return &reXML, &miniPayCommonResult, err
@@ -250,7 +250,7 @@ func MinipaySign(key string, m map[string]interface{}) (string, error) {
 	//最后拼接上key，得到签名之前的字符串
 	signStr = signStr + "&key=" + key
 
-	logs.Debug("签名之前的字符串------------", signStr)
+	log.Println("签名之前的字符串------------", signStr)
 
 	md5Handle := md5.New()
 	_, err := md5Handle.Write([]byte(signStr))
@@ -263,7 +263,7 @@ func MinipaySign(key string, m map[string]interface{}) (string, error) {
 	}
 
 	tosign := strings.ToUpper(fmt.Sprintf("%x", signByte))
-	logs.Debug("签名的结果为-------", tosign)
+	log.Println("签名的结果为-------", tosign)
 	return tosign, nil
 }
 
@@ -277,12 +277,12 @@ func PostMiniPay(url string, data map[string]interface{}) (MiniPaySyncResult, er
 	}
 	xmlStr := fmt.Sprintf("<xml>%s</xml>", buf.String())
 
-	logs.Debug("发起预下单的xml数据：----------", xmlStr)
-	logs.Debug("通过Http客户端发起请求------", httpsclient)
-	logs.Debug("通过Http客户端发起请求，请求的Url------", url)
-	logs.Debug("通过Http客户端发起请求，请求的数据------", xmlStr)
+	log.Println("发起预下单的xml数据：----------", xmlStr)
+	log.Println("通过Http客户端发起请求------", httpsclient)
+	log.Println("通过Http客户端发起请求，请求的Url------", url)
+	log.Println("通过Http客户端发起请求，请求的数据------", xmlStr)
 	re, err := httpsclient.PostData(url, "text/xml:charset=UTF-8", xmlStr)
-	logs.Debug("通过Http客户端发起请求，回返的数据是字节，经过string之后的数据------", string(re))
+	log.Println("通过Http客户端发起请求，回返的数据是字节，经过string之后的数据------", string(re))
 	if err != nil {
 		return xmlRe, errors.New("通过Http客户端发起请求出错，错误---------- " + err.Error())
 	}
