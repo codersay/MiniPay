@@ -13,9 +13,9 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"log"
 	"github.com/shopspring/decimal"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"sort"
@@ -29,11 +29,10 @@ var (
 
 //微信小程序支付公共参数
 type MiniPayParams struct {
-	AppID       string       // appID
-	MchID       string       // 商户号
-	Key         string       // 密钥
+	AppID string // appID
+	MchID string // 商户号
+	Key   string // 密钥
 }
-
 
 // Charge 发起小程序预下单的支付参数，基他参数在发起拼接时临时改，比如minipay.go文件 第57行 payHandle["nonce_str"] = RandomStr()
 //https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_1
@@ -41,15 +40,13 @@ type MiniPayParams struct {
 type PayArg struct {
 	//Golang中，如果指定一个field序列化成JSON的变量名字为-，则序列化的时候自动忽略这个field。
 	//而omitempty的作用是当一个field的值是empty的时候，序列化JSON时候忽略这个field（Newtonsoft.Json的类似用法参考这里和例子）。
-	//https://ethancai.github.io/2016/06/23/bad-parts-about-json-serialization-in-Golang/
 	//使用omitempty熟悉，如果该字段为nil或0值（数字0,字符串"",空数组[]等），则打包的JSON结果不会有这个字段。
-	//https://blog.csdn.net/tiaotiaoyly/article/details/38942311
 	//type Message struct {
 	//	Name string `json:"msg_name"`       // 对应JSON的msg_name
 	//	Body string `json:"body,omitempty"` // 如果为空置则忽略字段
 	//	Time int64  `json:"-"`              // 直接忽略字段
 	//}
-	APPID       string       // appID
+	APPID       string  // appID
 	TradeNum    string  `json:"tradeNum,omitempty"`
 	MoneyFee    float64 `json:"MoneyFee,omitempty"`
 	CallbackURL string  `json:"callbackURL,omitempty"`
@@ -73,8 +70,8 @@ type MiniPayCommonResult struct {
 // 以下字段在return_code为SUCCESS的时候有返回
 //统一下单与查询结果通用部分
 type MiniPayReturnSuccessData struct {
-	AppID      string `xml:"appid,omitempty" json:"appid,omitempty"`
-	MchID      string `xml:"mch_id,omitempty" json:"mch_id,omitempty"`
+	AppID string `xml:"appid,omitempty" json:"appid,omitempty"`
+	MchID string `xml:"mch_id,omitempty" json:"mch_id,omitempty"`
 	//DeviceInfo 统一下单默认就有，查询结果在return_code 、result_code、trade_state都为SUCCESS时有返回，这里统一放在这里
 	DeviceInfo string `xml:"device_info,omitempty" json:"device_info,omitempty"`
 	NonceStr   string `xml:"nonce_str,omitempty" json:"nonce_str,omitempty"`
@@ -88,31 +85,28 @@ type MiniPayReturnSuccessData struct {
 //https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=9_2
 //以下字段在return_code 、result_code、trade_state都为SUCCESS时有返回 ，如trade_state不为 SUCCESS，则只返回out_trade_no（必传）和attach（选传）。
 type MiniPayResultData struct {
-	OpenID         string `xml:"openid,omitempty" json:"openid,omitempty"`
-	IsSubscribe    string `xml:"is_subscribe,omitempty" json:"is_subscribe,omitempty"`
-	TradeType      string `xml:"trade_type,omitempty" json:"trade_type,omitempty"`
-	TradeState     string `xml:"trade_state,omitempty" json:"trade_state,omitempty"`
-	BankType       string `xml:"bank_type,omitempty" json:"bank_type,omitempty"`
-	TotalFee       string `xml:"total_fee,omitempty" json:"total_fee,omitempty"`
-	SettlementTotalFee  string `xml:"settlement_total_fee,omitempty" json:"settlement_total_fee,omitempty"`
-	FeeType        string `xml:"fee_type,omitempty" json:"fee_type,omitempty"`
-	CashFee        string `xml:"cash_fee,omitempty" json:"cash_fee,omitempty"`
-	CashFeeType    string `xml:"cash_fee_type,omitempty" json:"cash_fee_type,omitempty"`
-
-	/*
-	代金券金额	coupon_fee	否	Int	100	“代金券”金额<=订单金额，订单金额-“代金券”金额=现金支付金额，详见支付金额
-	代金券使用数量	coupon_count	否	Int	1	代金券使用数量
-	代金券类型	coupon_type_$n	否	String	CASH
-	CASH--充值代金券
-	NO_CASH---非充值优惠券
-
-	开通免充值券功能，并且订单使用了优惠券后有返回（取值：CASH、NO_CASH）。$n为下标,从0开始编号，举例：coupon_type_$0
-
-	代金券ID	coupon_id_$n	否	String(20)	10000 	代金券ID, $n为下标，从0开始编号
-	单个代金券支付金额	coupon_fee_$n	否	Int	100	单个代金券支付金额, $n为下标，从0开始编号
-	*/
+	OpenID             string `xml:"openid,omitempty" json:"openid,omitempty"`
+	IsSubscribe        string `xml:"is_subscribe,omitempty" json:"is_subscribe,omitempty"`
+	TradeType          string `xml:"trade_type,omitempty" json:"trade_type,omitempty"`
+	TradeState         string `xml:"trade_state,omitempty" json:"trade_state,omitempty"`
+	BankType           string `xml:"bank_type,omitempty" json:"bank_type,omitempty"`
+	TotalFee           string `xml:"total_fee,omitempty" json:"total_fee,omitempty"`
+	SettlementTotalFee string `xml:"settlement_total_fee,omitempty" json:"settlement_total_fee,omitempty"`
+	FeeType            string `xml:"fee_type,omitempty" json:"fee_type,omitempty"`
+	CashFee            string `xml:"cash_fee,omitempty" json:"cash_fee,omitempty"`
+	CashFeeType        string `xml:"cash_fee_type,omitempty" json:"cash_fee_type,omitempty"`
 
 
+	//代金券金额	coupon_fee	否	Int	100	“代金券”金额<=订单金额，订单金额-“代金券”金额=现金支付金额，详见支付金额
+	//代金券使用数量	coupon_count	否	Int	1	代金券使用数量
+	//代金券类型	coupon_type_$n	否	String	CASH
+	//CASH--充值代金券
+	//NO_CASH---非充值优惠券
+	//
+	//开通免充值券功能，并且订单使用了优惠券后有返回（取值：CASH、NO_CASH）。$n为下标,从0开始编号，举例：coupon_type_$0
+	//
+	//代金券ID	coupon_id_$n	否	String(20)	10000 	代金券ID, $n为下标，从0开始编号
+	//单个代金券支付金额	coupon_fee_$n	否	Int	100	单个代金券支付金额, $n为下标，从0开始编号
 	TransactionID  string `xml:"transaction_id,omitempty" json:"transaction_id,omitempty"`
 	OutTradeNO     string `xml:"out_trade_no,omitempty" json:"out_trade_no,omitempty"`
 	Attach         string `xml:"attach,omitempty" json:"attach,omitempty"`
@@ -123,10 +117,9 @@ type MiniPayResultData struct {
 //支付结果，以下字段在return_code 和result_code都为SUCCESS的时候有返回
 type MinipayStateData struct {
 	TradeType string `xml:"trade_type" json:"trade_type,omitempty"`
-	PrepayID string `xml:"prepay_id" json:"prepay_id,omitempty"`
-	CodeURL  string `xml:"code_url" json:"code_url,omitempty"`
+	PrepayID  string `xml:"prepay_id" json:"prepay_id,omitempty"`
+	CodeURL   string `xml:"code_url" json:"code_url,omitempty"`
 }
-
 
 //异步支付 返回结果
 type MiniPayAsyncResult struct {
@@ -355,4 +348,3 @@ func LocalIP() string {
 	}
 	return ""
 }
-
