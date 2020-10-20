@@ -2,6 +2,8 @@
 
 **go语言版微信小程序支付系统 开源地址** 
 - GitHub: https://github.com/codersay/MiniPay/
+**慕课网go语言体系课 抢先体验 电子书地址** 
+- 全栈编程@luboke.com: https://luboke.com/go
 
 目录：
 - [go语言版微信小程序支付系统](#intro) 
@@ -18,10 +20,9 @@ go语言版微信小程序支付系统
 支付微信小程序端任何业务的支付需要
     
 <a name="site"></a>
-# 全栈编程
+# 全栈编程,专注编程技术.
 
-http://www.luboke.com
-   
+https://luboke.com
 
 <a name="aboutme"></a>
 ## 关于我
@@ -29,8 +30,8 @@ http://www.luboke.com
 对电商抢购、支付场景具有丰富的实战经验。对大数据分布式存储，系统架构层面具有一定的经验. 
 欢迎fork me: https://github.com/codersay 
 我的B站: https://space.bilibili.com/443684499 
-我录制的go语言微商城系统原型已发布在慕课网: https://www.imooc.com/learn/1151 
-我的微信号: codersay
+慕课网go语言微商城系统原型: https://www.imooc.com/learn/1151 
+我的微信号: codersay 暗号: github
    
 
 <a name="support"></a>
@@ -41,10 +42,10 @@ http://www.luboke.com
 
 <a name="alipay"></a>
 ### 支付宝打赏赞助
-![支付宝打赏赞助](http://www.luboke.com/medias/reward/alipay.jpg)
+![支付宝打赏赞助](https://luboke.com/medias/reward/alipay.jpg)
 
 <a name="wxpay"></a>
 ### 微信打赏赞助
-![微信打赏赞助](http://www.luboke.com/medias/reward/wechat.jpg)
+![微信打赏赞助](https://luboke.com/medias/reward/wechat.jpg)
 
 
