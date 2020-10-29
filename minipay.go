@@ -55,7 +55,7 @@ func (this *MiniPayParams) UnifiedPay(payArg *PayArg) (map[string]interface{}, e
 	payHandle["nonce_str"] = RandomString()
 	payHandle["body"] = payArg.Body
 	payHandle["out_trade_no"] = payArg.TradeNum
-	payHandle["total_fee"] = Float2String(payArg.MoneyFee)
+	payHandle["total_fee"] = fmt.Sprintf("%f",payArg.MoneyFee)
 
 	//payHandle["total_fee"] = strconv.FormatFloat(payArg.MoneyFee,'E',-1,32)
  	//payHandle["spbill_create_ip"] = common.LocalIP()
