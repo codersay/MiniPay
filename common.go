@@ -13,8 +13,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/shopspring/decimal"
-	"io"
+	io"
 	"log"
 	"net"
 	"net/http"
@@ -294,13 +293,6 @@ func PostMiniPay(url string, data map[string]interface{}) (MiniPaySyncResult, er
 		return xmlRe, errors.New("通过Http客户端发起请求，回返的数据是字节，经过string之后的数据 ErrCodeDes 出错 ----------- " + xmlRe.ErrCodeDes)
 	}
 	return xmlRe, nil
-}
-
-// 微信金额浮点转字符串
-func Float2String(moneyFee float64) string {
-	aDecimal := decimal.NewFromFloat(moneyFee)
-	bDecimal := decimal.NewFromFloat(100)
-	return aDecimal.Mul(bDecimal).Truncate(0).String()
 }
 
 //RandomStr 获取一个随机字符串
