@@ -2,7 +2,7 @@
 
 **go语言版微信小程序支付系统 开源地址** 
 - GitHub: https://github.com/codersay/MiniPay/
-**慕课网go语言体系课 抢先体验 电子书地址** 
+**go语言体系课 免费视频教程 视频教程与电子书地址** 
 - 全栈编程@luboke.com: https://luboke.com/go
 
 目录：
@@ -10,7 +10,7 @@
     - [站点](#site)
     - [关于本人](#aboutme)
     - [赞助我](#support)
-- [慕课网go语言体系课电子书抢先体验](#lubokego) 
+- [全栈编程原创的go语言体系课免费视频教程](#lubokego) 
 
     
 <a name="intro"></a>
@@ -27,11 +27,10 @@ https://luboke.com
 
 <a name="aboutme"></a>
 ## 关于我
-作者具有多年产品设计与一线开发经验，adobe认证产品专家ACPE,一名具备PM思维的RD. 擅长go，python，php，mysql，socket编程,js，小程序等前端技术。
+作者具有多年产品设计与一线开发经验，一名具备PM思维的RD. 擅长go，python，php，mysql，socket编程,js，小程序等前端技术。
 对电商抢购、支付场景具有丰富的实战经验。对大数据分布式存储，系统架构层面具有一定的经验. 
 欢迎fork me: https://github.com/codersay 
 我的B站: https://space.bilibili.com/443684499 
-慕课网go语言微商城系统原型: https://www.imooc.com/learn/1151 
 我的微信号: codersay 暗号: github
 
 
